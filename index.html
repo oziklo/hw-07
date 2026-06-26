@@ -1,0 +1,461 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Britlex Language School</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/modern-normalize.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+    <link rel="stylesheet" href="./css/styles.css" />
+    <script src="./js/mobile-menu.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
+    <script src="./js/script.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-container">
+        <a class="logo" href="./index.html">Britlex</a>
+
+        <nav class="site-nav" aria-label="Main navigation">
+          <ul class="nav-list">
+            <li>
+              <a href="#home">Home</a>
+            </li>
+            <li>
+              <a href="#skills">Skills</a>
+            </li>
+            <li>
+              <a href="#about">About Us</a>
+            </li>
+            <li>
+              <a href="#pricing">Pricing</a>
+            </li>
+            <li>
+              <a href="#contacts">Contacts</a>
+            </li>
+            <li>
+              <a href="./Doroshuk_Variant_4/Doroshuk_4.html">Table</a>
+            </li>
+          </ul>
+        </nav>
+
+        <a class="header-button" href="#contacts">Let's Talk</a>
+
+        <button
+          class="menu-toggle"
+          type="button"
+          aria-controls="mobile-menu"
+          aria-expanded="false"
+          data-menu-open
+        >
+          <span class="visually-hidden">Open mobile menu</span>
+          <span class="menu-toggle-line"></span>
+          <span class="menu-toggle-line"></span>
+          <span class="menu-toggle-line"></span>
+        </button>
+      </div>
+    </header>
+
+    <div class="mobile-menu" id="mobile-menu" hidden data-menu>
+      <div class="mobile-menu-panel">
+        <div class="mobile-menu-top">
+          <a class="logo" href="./index.html">Britlex</a>
+
+          <button class="menu-close" type="button" data-menu-close>
+            <span class="visually-hidden">Close mobile menu</span>
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <nav aria-label="Mobile navigation">
+          <ul class="mobile-nav-list">
+            <li>
+              <a href="#home" data-menu-link>Home</a>
+            </li>
+            <li>
+              <a href="#skills" data-menu-link>Skills</a>
+            </li>
+            <li>
+              <a href="#about" data-menu-link>About Us</a>
+            </li>
+            <li>
+              <a href="#pricing" data-menu-link>Pricing</a>
+            </li>
+            <li>
+              <a href="#contacts" data-menu-link>Contacts</a>
+            </li>
+            <li>
+              <a href="./Doroshuk_Variant_4/Doroshuk_4.html" data-menu-link>
+                Table
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <a class="mobile-menu-button" href="#contacts" data-menu-link>
+          Let's Talk
+        </a>
+      </div>
+    </div>
+
+    <main>
+      <section class="section hero" id="home">
+        <div class="container hero-container">
+          <div class="hero-content">
+            <h1>Learn Any Foreign Language</h1>
+            <p>
+              With our teachers who write a program for each student, you will
+              be able to make your first sketch after the first lesson.
+            </p>
+            <a class="button button-dark" href="#contacts">Get started</a>
+          </div>
+
+          <div class="hero-visual">
+            <img
+              src="./images/learning-languages.png"
+              srcset="
+                ./images/learning-languages.png    1x,
+                ./images/learning-languages@2x.png 2x
+              "
+              alt="Student learning foreign languages online"
+              width="661"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section class="section skills" id="skills">
+        <div class="container">
+          <h2>Skills</h2>
+
+          <ul class="skills-list">
+            <li class="skills-item skills-item-large">
+              <article class="card skill-card">
+                <img
+                  src="./images/shared-goals.png"
+                  srcset="
+                    ./images/shared-goals.png    1x,
+                    ./images/shared-goals@2x.png 2x
+                  "
+                  alt="People discussing speaking skills"
+                  width="390"
+                />
+                <h3>Speaking</h3>
+                <p>
+                  Improve your English skills and confidence. Live classes and
+                  interactive lessons online. 20% extra free for a limited time
+                  only.
+                </p>
+                <p>
+                  Learn English online and improve your skills through our
+                  high-quality courses and resources.
+                </p>
+                <a class="button button-small" href="#contacts">Learn more</a>
+              </article>
+            </li>
+
+            <li class="skills-item">
+              <article class="card skill-card">
+                <img
+                  src="./images/typewriter.png"
+                  srcset="
+                    ./images/typewriter.png    1x,
+                    ./images/typewriter@2x.png 2x
+                  "
+                  alt="Typewriter for writing practice"
+                  width="390"
+                />
+                <h3>Writing</h3>
+                <p>
+                  One of the most important and extensive areas of natural
+                  science, the science that studies substances, also their
+                  composition.
+                </p>
+                <a class="button button-small" href="#contacts">Learn more</a>
+              </article>
+            </li>
+
+            <li class="skills-item">
+              <article class="card skill-card">
+                <img
+                  src="./images/house-bookshelves.png"
+                  srcset="
+                    ./images/house-bookshelves.png    1x,
+                    ./images/house-bookshelves@2x.png 2x
+                  "
+                  alt="Person reading books near bookshelves"
+                  width="390"
+                />
+                <h3>Reading</h3>
+                <p>
+                  Perception and response actions of the user resulting from the
+                  use or upcoming use of the product, system or service.
+                </p>
+                <a class="button button-small" href="#contacts">Learn more</a>
+              </article>
+            </li>
+
+            <li class="skills-item skills-item-wide">
+              <article class="card skill-card skill-card-horizontal">
+                <div>
+                  <h3>Listening</h3>
+                  <p>
+                    Here you can find activities to practise your listening
+                    skills. Listening will help you to improve your
+                    understanding.
+                  </p>
+                  <a class="button button-small" href="#contacts">Learn more</a>
+                </div>
+
+                <img
+                  src="./images/podcast-audience.png"
+                  srcset="
+                    ./images/podcast-audience.png    1x,
+                    ./images/podcast-audience@2x.png 2x
+                  "
+                  alt="People listening to an online podcast"
+                  width="390"
+                />
+              </article>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section about" id="about">
+        <div class="container about-container">
+          <div class="about-content">
+            <h2>About Us</h2>
+            <p id="about-text" class="expandable-text">
+              The model offers a framework for discussing problems related to
+              the user's experience, as well as possible ways and means of
+              solving them. Application development begins at the top level and
+              moves down. Britlex combines speaking, writing, reading and
+              listening practice in one learning plan. Students can work with
+              teachers online, choose personal lessons and receive additional
+              resources after every class. The extended description is hidden at
+              first, and JavaScript opens it when the user needs more details.
+            </p>
+
+            <button
+              class="button button-small expand-toggle"
+              type="button"
+              aria-expanded="false"
+              aria-controls="about-text"
+              data-expand-toggle
+            >
+              Show more
+            </button>
+
+            <ul class="stats-list">
+              <li>
+                <strong>800</strong>
+                <p>Pupils</p>
+              </li>
+              <li>
+                <strong>18</strong>
+                <p>Teachers</p>
+              </li>
+              <li>
+                <strong>6</strong>
+                <p>Foreign languages</p>
+              </li>
+            </ul>
+          </div>
+
+          <img
+            src="./images/business-competition.svg"
+            alt="People analysing business results"
+            width="500"
+          />
+        </div>
+      </section>
+
+      <section class="section pricing" id="pricing">
+        <div class="container">
+          <h2>Pricing</h2>
+
+          <div class="swiper pricing-swiper">
+            <ul class="swiper-wrapper pricing-list">
+              <li class="swiper-slide">
+                <article class="card price-card">
+                  <img
+                    src="./images/online.png"
+                    srcset="./images/online.png 1x, ./images/online@2x.png 2x"
+                    alt="Online test for language learning"
+                    width="311"
+                  />
+                  <h3>Self-study online course</h3>
+                  <p>
+                    Start learning English online in live classes with qualified
+                    EC teachers and students from all over the world.
+                  </p>
+                  <p class="price">
+                    <strong>£5.99</strong>
+                    <span>per month</span>
+                  </p>
+                  <button class="button button-small" type="button" data-modal-open>
+                    Course details
+                  </button>
+                </article>
+              </li>
+
+              <li class="swiper-slide">
+                <article class="card price-card">
+                  <img
+                    src="./images/lesson.png"
+                    srcset="./images/lesson.png 1x, ./images/lesson@2x.png 2x"
+                    alt="Teacher giving a personal online lesson"
+                    width="391"
+                  />
+                  <h3>Live online classes</h3>
+                  <p>
+                    Interactive group classes with expert teachers. Free 7-day
+                    trial.
+                  </p>
+                  <p class="price">
+                    <strong>£12.99</strong>
+                    <span>per month</span>
+                  </p>
+                  <button class="button button-small" type="button" data-modal-open>
+                    Course details
+                  </button>
+                </article>
+              </li>
+
+              <li class="swiper-slide">
+                <article class="card price-card">
+                  <img
+                    src="./images/webinar.png"
+                    srcset="./images/webinar.png 1x, ./images/webinar@2x.png 2x"
+                    alt="Webinar lesson with a teacher"
+                    width="340"
+                  />
+                  <h3>Personal tuition</h3>
+                  <p>
+                    Online one-to-one English tutoring. Enjoy our first session
+                    for only $1.
+                  </p>
+                  <p class="price">
+                    <strong>£20.99</strong>
+                    <span>per month</span>
+                  </p>
+                  <button class="button button-small" type="button" data-modal-open>
+                    Course details
+                  </button>
+                </article>
+              </li>
+            </ul>
+
+            <div class="swiper-pagination"></div>
+
+            <div class="pricing-controls" role="group" aria-label="Pricing slider controls">
+              <button class="swiper-button-prev" type="button"></button>
+              <button class="swiper-button-next" type="button"></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section contacts" id="contacts">
+        <div class="container contacts-container">
+          <img
+            src="./images/contact.png"
+            srcset="./images/contact.png 1x, ./images/contact@2x.png 2x"
+            alt="Person sending a contact message"
+            width="477"
+          />
+
+          <div class="contacts-content">
+            <h2>Contact Us</h2>
+            <p>
+              Discover your current English level by taking our free online
+              English test. Sign up to our newsletter for learning tips and free
+              resources.
+            </p>
+
+            <form
+              class="contact-form"
+              action="#"
+              method="post"
+              data-contact-form
+            >
+              <label for="contact-name">Name</label>
+              <input
+                type="text"
+                id="contact-name"
+                name="contact_name"
+                placeholder="Enter your name"
+                required
+              />
+
+              <label for="contact-email">Email</label>
+              <input
+                type="email"
+                id="contact-email"
+                name="contact_email"
+                placeholder="Enter your email"
+                required
+              />
+
+              <button type="submit">Subscribe</button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal-backdrop" data-modal hidden>
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="course-modal-title"
+      >
+        <button class="modal-close" type="button" data-modal-close>
+          <span class="visually-hidden">Close modal window</span>
+          <span aria-hidden="true">&times;</span>
+        </button>
+
+        <h2 id="course-modal-title">Course details</h2>
+        <p>
+          Choose a course format, leave your contact details and our manager
+          will send a personal learning plan. The modal window is controlled by
+          JavaScript and can be closed with the button, the Escape key or a click
+          outside the window.
+        </p>
+
+        <a class="button button-dark" href="#contacts" data-modal-close>
+          Contact us
+        </a>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="container footer-container">
+        <a class="logo" href="./index.html">Britlex</a>
+
+        <ul class="footer-list">
+          <li>
+            <a href="#">Terms and Conditions</a>
+          </li>
+          <li>
+            <a href="#">Privacy Policy</a>
+          </li>
+          <li>
+            <a href="#">Cookie Policy</a>
+          </li>
+        </ul>
+      </div>
+    </footer>
+  </body>
+</html>
