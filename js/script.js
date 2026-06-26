@@ -1,215 +1,489 @@
-"use strict";
+"use strict"
 
-// ЛР6: інтерактивні елементи сторінки через JavaScript.
+// ЛР7: REST API, fetch, проміси, пагінація, DOM та менеджер завдань
+
+const API_BASE_URL = "https://jsonplaceholder.typicode.com"
 
 document.addEventListener("DOMContentLoaded", () => {
-  initPricingSlider();
-  initContactForm();
-  initModal();
-  initExpandableText();
-  markElementsFromJavaScript();
-});
+  initUsersApi()
+  initTaskManager()
+})
 
-function initPricingSlider() {
-  const sliderElement = document.querySelector(".pricing-swiper");
+function initUsersApi() {
+  const form = document.querySelector("[data-user-form]")
+  const limitInput = document.querySelector("[data-user-limit]")
+  const button = document.querySelector("[data-user-button]")
+  const list = document.querySelector("[data-user-list]")
+  const status = document.querySelector("[data-user-status]")
 
-  if (!sliderElement) {
-    console.warn("Слайдер не знайдено на сторінці.");
-    return;
+  if (
+    !(form instanceof HTMLFormElement) ||
+    !(limitInput instanceof HTMLInputElement) ||
+    !(button instanceof HTMLButtonElement) ||
+    !(list instanceof HTMLUListElement) ||
+    !(status instanceof HTMLElement)
+  ) {
+    console.error("Помилка: елементи блоку REST API не знайдено")
+    return
   }
 
-  if (typeof Swiper !== "function") {
-    console.warn("Бібліотека Swiper не завантажена.");
-    return;
-  }
+  let page = 1
+  let limit = 0
+  let totalPages = null
+  let isLoading = false
 
-  new Swiper(sliderElement, {
-  slidesPerView: 1,
-  spaceBetween: 24,
-  loop: false,
-  rewind: true,
-  keyboard: {
-    enabled: true,
-  },
-  pagination: {
-    el: ".swiper-pagination",
-    clickable: true,
-  },
-  navigation: {
-    nextEl: ".swiper-button-next",
-    prevEl: ".swiper-button-prev",
-  },
-});
-}
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault()
 
-function initContactForm() {
-  const form = document.querySelector("[data-contact-form]");
-  const storageKey = "britlexContactRequests";
-  const requests = readSavedRequests(storageKey);
-
-  if (!(form instanceof HTMLFormElement)) {
-    console.warn("Форму контактів не знайдено.");
-    return;
-  }
-
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    const formData = collectFormData(form);
-
-    if (!formData) {
-      alert("Будь ласка, заповніть усі поля форми.");
-      return;
+    if (isLoading) {
+      return
     }
 
-    requests.push(formData);
-    saveRequests(storageKey, requests);
+    const parsedLimit = Number(limitInput.value)
 
-    console.log("Масив заявок з форми:", requests);
-
-    form.reset();
-    alert("Дані форми збережено успішно.");
-  });
-}
-
-function collectFormData(form) {
-  const result = {};
-  const elements = Array.from(form.elements);
-
-  for (const element of elements) {
-    if (
-      !(element instanceof HTMLInputElement) ||
-      !element.name ||
-      element.disabled
-    ) {
-      continue;
+    if (!Number.isInteger(parsedLimit) || parsedLimit < 1 || parsedLimit > 10) {
+      showStatus(status, "Введіть число від 1 до 10", "error")
+      return
     }
 
-    const value = element.value.trim();
-
-    if (!value) {
-      return null;
+    if (limit !== parsedLimit) {
+      limit = parsedLimit
+      page = 1
+      totalPages = null
+      list.innerHTML = ""
+      button.textContent = "Завантажити користувачів"
     }
 
-    result[element.name] = value;
-  }
-
-  return result;
-}
-
-function readSavedRequests(storageKey) {
-  try {
-    const savedValue = localStorage.getItem(storageKey);
-
-    if (!savedValue) {
-      return [];
+    if (totalPages !== null && page > totalPages) {
+      showStatus(status, "Дані для завантаження відсутні", "warning")
+      return
     }
 
-    const parsedValue = JSON.parse(savedValue);
+    try {
+      isLoading = true
+      button.disabled = true
+      button.textContent = page === 1 ? "Завантаження..." : "Завантаження ще..."
 
-    if (!Array.isArray(parsedValue)) {
-      return [];
+      const result = await fetchUsers(page, limit)
+      const users = result.items
+
+      if (totalPages === null) {
+        totalPages = Math.ceil(result.totalCount / limit)
+      }
+
+      if (users.length === 0) {
+        showStatus(status, "Дані для завантаження відсутні", "warning")
+        button.textContent = "Дані закінчилися"
+        return
+      }
+
+      renderUsers(users, list)
+      showStatus(
+        status,
+        `Завантажено сторінку ${page} з ${totalPages}`,
+        "success"
+      )
+
+      page += 1
+
+      if (totalPages !== null && page > totalPages) {
+        button.textContent = "Дані закінчилися"
+      } else {
+        button.textContent = "Завантажити ще користувачів"
+      }
+    } catch (error) {
+      const message = getErrorMessage(error)
+      showStatus(status, message, "error")
+      button.textContent = page === 1
+        ? "Завантажити користувачів"
+        : "Завантажити ще користувачів"
+    } finally {
+      isLoading = false
+
+      if (totalPages === null || page <= totalPages) {
+        button.disabled = false
+      }
+    }
+  })
+}
+
+async function fetchUsers(page, limit) {
+  const params = new URLSearchParams({
+    _page: String(page),
+    _limit: String(limit)
+  })
+
+  const response = await fetch(`${API_BASE_URL}/users?${params.toString()}`)
+
+  if (!response.ok) {
+    throw new Error(`Помилка HTTP ${response.status}`)
+  }
+
+  const totalCountHeader = response.headers.get("X-Total-Count")
+  const totalCount = totalCountHeader ? Number(totalCountHeader) : 0
+  const items = await response.json()
+
+  if (!Array.isArray(items)) {
+    throw new Error("Сервер повернув некоректний формат даних")
+  }
+
+  return {
+    items,
+    totalCount
+  }
+}
+
+function renderUsers(users, list) {
+  const markup = users
+    .map((user) => {
+      const name = escapeHtml(user.name)
+      const email = escapeHtml(user.email)
+      const phone = escapeHtml(user.phone)
+      const website = escapeHtml(user.website)
+      const companyName = escapeHtml(user.company?.name ?? "Немає даних")
+      const city = escapeHtml(user.address?.city ?? "Немає даних")
+
+      return `
+        <li class="user-card">
+          <h3>${name}</h3>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Телефон:</strong> ${phone}</p>
+          <p><strong>Сайт:</strong> ${website}</p>
+          <p><strong>Компанія:</strong> ${companyName}</p>
+          <p><strong>Місто:</strong> ${city}</p>
+        </li>
+      `
+    })
+    .join("")
+
+  list.insertAdjacentHTML("beforeend", markup)
+}
+
+function initTaskManager() {
+  const loadButton = document.querySelector("[data-load-tasks]")
+  const form = document.querySelector("[data-task-form]")
+  const input = document.querySelector("[data-task-input]")
+  const list = document.querySelector("[data-task-list]")
+  const status = document.querySelector("[data-task-status]")
+  const activeCountElement = document.querySelector("[data-active-count]")
+  const completedCountElement = document.querySelector("[data-completed-count]")
+  const filterButtons = document.querySelectorAll("[data-filter]")
+
+  if (
+    !(loadButton instanceof HTMLButtonElement) ||
+    !(form instanceof HTMLFormElement) ||
+    !(input instanceof HTMLInputElement) ||
+    !(list instanceof HTMLUListElement) ||
+    !(status instanceof HTMLElement) ||
+    !(activeCountElement instanceof HTMLElement) ||
+    !(completedCountElement instanceof HTMLElement) ||
+    filterButtons.length === 0
+  ) {
+    console.error("Помилка: елементи менеджера завдань не знайдено")
+    return
+  }
+
+  let tasks = []
+  let currentFilter = "all"
+  let isLoading = false
+
+  loadButton.addEventListener("click", async () => {
+    if (isLoading) {
+      return
     }
 
-    return parsedValue;
-  } catch (error) {
-    console.error("Не вдалося прочитати дані з localStorage:", error);
-    return [];
-  }
-}
+    try {
+      isLoading = true
+      loadButton.disabled = true
+      loadButton.textContent = "Завантаження..."
 
-function saveRequests(storageKey, requests) {
-  try {
-    localStorage.setItem(storageKey, JSON.stringify(requests));
-  } catch (error) {
-    console.error("Не вдалося зберегти дані в localStorage:", error);
-  }
-}
+      tasks = await fetchTasks()
+      renderTaskState()
 
-function initModal() {
-  const modalBackdrop = document.querySelector("[data-modal]");
-  const openButtons = document.querySelectorAll("[data-modal-open]");
-  const closeButtons = document.querySelectorAll("[data-modal-close]");
-
-  if (!(modalBackdrop instanceof HTMLElement) || openButtons.length === 0) {
-    console.warn("Модальне вікно або кнопки відкриття не знайдено.");
-    return;
-  }
-
-  const openModal = () => {
-    modalBackdrop.hidden = false;
-    document.body.classList.add("modal-open");
-  };
-
-  const closeModal = () => {
-    modalBackdrop.hidden = true;
-    document.body.classList.remove("modal-open");
-  };
-
-  openButtons.forEach((button) => {
-    button.addEventListener("click", openModal);
-  });
-
-  closeButtons.forEach((button) => {
-    button.addEventListener("click", closeModal);
-  });
-
-  modalBackdrop.addEventListener("click", (event) => {
-    if (event.target === modalBackdrop) {
-      closeModal();
+      showStatus(status, "Задачі успішно завантажено", "success")
+      loadButton.textContent = "Оновити задачі"
+    } catch (error) {
+      showStatus(status, getErrorMessage(error), "error")
+      loadButton.textContent = "Завантажити задачі"
+    } finally {
+      isLoading = false
+      loadButton.disabled = false
     }
-  });
+  })
 
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && !modalBackdrop.hidden) {
-      closeModal();
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault()
+
+    const title = input.value.trim()
+
+    if (!title) {
+      showStatus(status, "Введіть текст завдання", "error")
+      return
     }
-  });
+
+    try {
+      const createdTask = await addTask(title)
+
+      tasks = [
+        {
+          ...createdTask,
+          id: createLocalTaskId(tasks),
+          title,
+          completed: false,
+          userId: 4
+        },
+        ...tasks
+      ]
+
+      input.value = ""
+      renderTaskState()
+      showStatus(status, "Задачу додано на сторінку", "success")
+    } catch (error) {
+      showStatus(status, getErrorMessage(error), "error")
+    }
+  })
+
+  list.addEventListener("change", (event) => {
+    const target = event.target
+
+    if (!(target instanceof HTMLInputElement) || target.type !== "checkbox") {
+      return
+    }
+
+    const taskId = Number(target.dataset.taskId)
+
+    if (!Number.isInteger(taskId)) {
+      showStatus(status, "Не вдалося визначити задачу", "error")
+      return
+    }
+
+    tasks = tasks.map((task) => {
+      if (task.id !== taskId) {
+        return task
+      }
+
+      return {
+        ...task,
+        completed: target.checked
+      }
+    })
+
+    renderTaskState()
+    showStatus(status, "Статус задачі оновлено локально", "success")
+  })
+
+  list.addEventListener("click", async (event) => {
+    const target = event.target
+
+    if (!(target instanceof HTMLButtonElement)) {
+      return
+    }
+
+    const taskId = Number(target.dataset.deleteTaskId)
+
+    if (!Number.isInteger(taskId)) {
+      return
+    }
+
+    try {
+      target.disabled = true
+      await deleteTask(taskId)
+
+      tasks = tasks.filter((task) => task.id !== taskId)
+      renderTaskState()
+      showStatus(status, "Задачу видалено зі сторінки", "success")
+    } catch (error) {
+      target.disabled = false
+      showStatus(status, getErrorMessage(error), "error")
+    }
+  })
+
+  filterButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!(button instanceof HTMLButtonElement)) {
+        return
+      }
+
+      const filter = button.dataset.filter
+
+      if (!filter || !["all", "active", "completed"].includes(filter)) {
+        showStatus(status, "Невідомий фільтр задач", "error")
+        return
+      }
+
+      currentFilter = filter
+
+      filterButtons.forEach((item) => {
+        item.classList.remove("is-active")
+      })
+
+      button.classList.add("is-active")
+      renderTaskState()
+    })
+  })
+
+  function renderTaskState() {
+    renderTasks(filterTasks(tasks, currentFilter), list)
+    updateTaskCounters(tasks, activeCountElement, completedCountElement)
+  }
 }
 
-function initExpandableText() {
-  const button = document.querySelector("[data-expand-toggle]");
+async function fetchTasks() {
+  const params = new URLSearchParams({
+    _limit: "10",
+    _page: "1"
+  })
 
-  if (!(button instanceof HTMLButtonElement)) {
-    console.warn("Кнопку розгортання тексту не знайдено.");
-    return;
+  const response = await fetch(`${API_BASE_URL}/todos?${params.toString()}`)
+
+  if (!response.ok) {
+    throw new Error(`Помилка HTTP ${response.status}`)
   }
 
-  const textId = button.getAttribute("aria-controls");
-  const textElement = textId ? document.getElementById(textId) : null;
+  const data = await response.json()
 
-  if (!textElement) {
-    console.warn("Текстовий блок для розгортання не знайдено.");
-    return;
+  if (!Array.isArray(data)) {
+    throw new Error("Сервер повернув некоректний формат задач")
   }
 
-  button.addEventListener("click", () => {
-    const isExpanded = textElement.classList.toggle("is-expanded");
-
-    button.setAttribute("aria-expanded", String(isExpanded));
-    button.textContent = isExpanded ? "Show less" : "Show more";
-  });
+  return data
 }
 
-function markElementsFromJavaScript() {
-  const aboutTextById = document.getElementById("about-text");
-  const modalByClass = document.querySelector(".modal");
-  const mainByTag = document.querySelector("main");
-  const priceCards = document.querySelectorAll(".price-card");
+async function addTask(title) {
+  const response = await fetch(`${API_BASE_URL}/todos`, {
+    method: "POST",
+    body: JSON.stringify({
+      title,
+      completed: false,
+      userId: 4
+    }),
+    headers: {
+      "Content-Type": "application/json; charset=UTF-8"
+    }
+  })
 
-  if (aboutTextById) {
-    aboutTextById.dataset.jsReady = "true";
+  if (!response.ok) {
+    throw new Error(`Помилка HTTP ${response.status}`)
   }
 
-  if (modalByClass) {
-    modalByClass.classList.add("js-modal-ready");
+  return response.json()
+}
+
+async function deleteTask(taskId) {
+  const response = await fetch(`${API_BASE_URL}/todos/${taskId}`, {
+    method: "DELETE"
+  })
+
+  if (!response.ok) {
+    throw new Error(`Помилка HTTP ${response.status}`)
   }
 
-  if (mainByTag) {
-    mainByTag.classList.add("js-page-ready");
+  return true
+}
+
+function filterTasks(tasks, filter) {
+  switch (filter) {
+    case "active":
+      return tasks.filter((task) => !task.completed)
+    case "completed":
+      return tasks.filter((task) => task.completed)
+    case "all":
+      return tasks
+    default:
+      return tasks
+  }
+}
+
+function renderTasks(tasks, list) {
+  if (tasks.length === 0) {
+    list.innerHTML = `
+      <li class="task-item">
+        <p class="task-title">Немає задач для відображення</p>
+      </li>
+    `
+    return
   }
 
-  priceCards.forEach((card) => {
-    card.classList.add("js-highlight-card");
-  });
+  const markup = tasks
+    .map((task) => {
+      const title = escapeHtml(task.title)
+      const completedClass = task.completed ? " is-completed" : ""
+      const checked = task.completed ? "checked" : ""
+
+      return `
+        <li class="task-item">
+          <input
+            class="task-checkbox"
+            type="checkbox"
+            data-task-id="${task.id}"
+            aria-label="Змінити статус задачі"
+            ${checked}
+          >
+          <p class="task-title${completedClass}">${title}</p>
+          <button
+            class="delete-button"
+            type="button"
+            data-delete-task-id="${task.id}"
+            aria-label="Видалити задачу"
+          >
+            ×
+          </button>
+        </li>
+      `
+    })
+    .join("")
+
+  list.innerHTML = markup
+}
+
+function updateTaskCounters(tasks, activeCountElement, completedCountElement) {
+  const completedCount = tasks.filter((task) => task.completed).length
+  const activeCount = tasks.length - completedCount
+
+  activeCountElement.textContent = String(activeCount)
+  completedCountElement.textContent = String(completedCount)
+}
+
+function createLocalTaskId(tasks) {
+  const maxId = tasks.reduce((maxValue, task) => {
+    return task.id > maxValue ? task.id : maxValue
+  }, 0)
+
+  return maxId + 1
+}
+
+function showStatus(element, message, type) {
+  element.textContent = message
+  element.classList.remove("is-success", "is-error", "is-warning")
+
+  if (type === "success") {
+    element.classList.add("is-success")
+    return
+  }
+
+  if (type === "error") {
+    element.classList.add("is-error")
+    return
+  }
+
+  if (type === "warning") {
+    element.classList.add("is-warning")
+  }
+}
+
+function getErrorMessage(error) {
+  if (error instanceof Error) {
+    return error.message
+  }
+
+  return "Сталася невідома помилка"
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;")
 }
