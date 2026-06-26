@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Лабораторна робота 7 | REST API</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E7%3C/text%3E%3C/svg%3E"
+    >
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -71,7 +75,7 @@
             </p>
           </div>
 
-          <form class="api-form" data-user-form>
+          <form class="api-form" id="user-form" data-user-form>
             <label class="field">
               <span>Кількість користувачів за один запит</span>
               <input
@@ -85,15 +89,22 @@
                 data-user-limit
               >
             </label>
-
-            <button class="button button-primary" type="submit" data-user-button>
-              Завантажити користувачів
-            </button>
           </form>
 
           <p class="status-message" role="status" data-user-status></p>
 
           <ul class="user-list" data-user-list></ul>
+
+          <div class="task-actions">
+            <button
+              class="button button-primary"
+              type="submit"
+              form="user-form"
+              data-user-button
+            >
+              Завантажити користувачів
+            </button>
+          </div>
         </div>
       </section>
 
